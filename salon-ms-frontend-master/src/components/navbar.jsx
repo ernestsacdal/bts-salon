@@ -86,10 +86,16 @@ function Navbar() {
             <span>Language</span>
           </a>
           <button
-            onClick={() => Nav("/SignUp")}
+            onClick={() => Nav("/AdminSignup")}
             className="btnPrimary py-1 px-4 transition-all duration-300 rounded hover:text-white hover:bg-indigo-600 "
           >
-            <Link to="/Signup">Sign Up</Link>
+            <Link to="/AdminSignup"> Salon Owner </Link>
+          </button>
+          <button
+            onClick={() => Nav("/ClientSignup")}
+            className="btnPrimary py-1 px-4 transition-all duration-300 rounded hover:text-white hover:bg-indigo-600 "
+          >
+            <Link to="/ClientSignup">Salon Client</Link>
           </button>
         </div>
       </div>
