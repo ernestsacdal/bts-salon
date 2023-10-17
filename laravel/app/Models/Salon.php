@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Inventory;
+use App\Models\Staff;
 
 class Salon extends Authenticatable
 {
@@ -23,7 +25,15 @@ class Salon extends Authenticatable
         'email',
         'password',
     ];
+    public function inventory()
+    {
+        return $this->hasMany(Inventory::class);
+    }
 
+    public function staff()
+    {
+        return $this->hasMany(Staff::class);
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

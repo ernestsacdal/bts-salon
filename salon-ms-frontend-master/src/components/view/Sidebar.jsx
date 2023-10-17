@@ -6,6 +6,7 @@ import Dashboard from "./components/dashboard";
 import Inventory from "./components/inventory";
 import Staff from "./components/Staff";
 import watson from "./components/assets/watson.jpg";
+import { useEffect } from "react";
 
 function formatTimeAgo(timestamp) {
   const now = new Date();
@@ -27,6 +28,13 @@ function Sidebar() {
   const [isOpenSidebar, setIsOpenSidebar] = useState(true);
   const [selected, setSelected] = useState("");
   
+  // const navigate = useNavigate();
+        
+  // useEffect(() => {
+  //   if (localStorage.getItem('authToken')) {
+  //     navigate('/sidebar/');
+  //   }
+  // }, [navigate]); 
 
   const sidebarComp = [
     {

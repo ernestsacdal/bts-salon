@@ -11,14 +11,12 @@ class ClientAuthController extends Controller
     ///////////////////////////////////////////////////////////////////////
     public function registerC(Request $request)
     {
-        // Validate the request data
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:clients,email',
             'password' => 'required|string|confirmed',
         ]);
 
-        // Create and save the client user
         $client = new Client([
             'name' => $request->name,
             'email' => $request->email,
@@ -36,7 +34,6 @@ class ClientAuthController extends Controller
 
     public function logoutC(Request $request)
     {
-        // Revoke the salon user's token
         $request->user('client')->tokens()->delete();
 
         return response()->json(['message' => 'Client logged out successfully']);
@@ -46,20 +43,16 @@ class ClientAuthController extends Controller
 
     public function loginC(Request $request)
     {
-        // Validate the request data
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
     
-        // Attempt to authenticate the client
         if (Auth::guard('client-api')->attempt($request->only('email', 'password'))) {
             $client = Client::where('email', $request->email)->first();
     
-            // Generate an authentication token for the client
             $token = $client->createToken('client-token')->plainTextToken;
     
-            // Return the token as a response
             return response()->json(['access_token' => $token], 200);
         }
     

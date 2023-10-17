@@ -1,70 +1,88 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
-
+import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "./axios";
 function AdminSignIn() {
   // State variables
   const [isSignUp, setIsSignUp] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginMessage, setLoginMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [isOtpValid, setIsOtpValid] = useState(true); // To track OTP validity
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  // const [loginMessage, setLoginMessage] = useState("");
+  // const [showModal, setShowModal] = useState(false);
+  // const [otp, setOtp] = useState("");
+  // const [isOtpValid, setIsOtpValid] = useState(true); // To track OTP validity
+  // const [isLoading, setIsLoading] = useState(false);
 
   // Handle form submission for both sign-up and login
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Dummy validation
-    if (!phoneNumber || !password) {
-      setLoginMessage("Please fill in all fields.");
-      return;
-    }
-
-    // Create a payload with user credentials
-    const userData = {
-      phoneNumber,
-      password,
-    };
-
     try {
-      setIsLoading(true); // Show loading animation
-
-      // Make a POST request to your authentication API endpoint
-      const response = await axios.post("YOUR_API_ENDPOINT_HERE", userData);
-
-      // Check if the login was successful (customize this based on your API's response)
-      if (response.data && response.data.success) {
-        // Display a success message
-        setLoginMessage(
-          `Login successful for phone number: ${phoneNumber} as Admin`
-        );
-
-        // Show the OTP modal
-        setShowModal(true);
+      const response = await axiosInstance.post('http://127.0.0.1:8000/api/login', {
+          email: email,
+          password: password,
+      });
+      const token = response.data.access_token;
+      localStorage.setItem('authToken', token);
+      navigate('/sidebar');
+  }  catch (error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          console.error("Invalid credentials");
+        } else {
+          console.error("An error occurred:", error.response.data);
+        }
       } else {
-        // Handle failed login (customize this based on your API's response)
-        setLoginMessage("Login failed. Please check your credentials.");
+        console.error("Network error:", error.message);
       }
-    } catch (error) {
-      // Handle API request errors
-      console.error("Error:", error);
-      setLoginMessage("An error occurred while processing your request.");
-    } finally {
-      setIsLoading(false); // Hide loading animation
     }
-  };
+    // // Dummy validation
+    // if (!phoneNumber || !password) {
+    //   setLoginMessage("Please fill in all fields.");
+    //   return;
+    // }
+
+    // // Create a payload with user credentials
+    // const userData = {
+    //   phoneNumber,
+    //   password,
+    // };
+
+  //   try {
+  //     setIsLoading(true); // Show loading animation
+
+  //     // Make a POST request to your authentication API endpoint
+  //     const response = await axios.post("YOUR_API_ENDPOINT_HERE", userData);
+
+  //     // Check if the login was successful (customize this based on your API's response)
+  //     if (response.data && response.data.success) {
+  //       // Display a success message
+  //       setLoginMessage(
+  //         `Login successful for phone number: ${phoneNumber} as Admin`
+  //       );
+
+  //       // Show the OTP modal
+  //       setShowModal(true);
+  //     } else {
+  //       // Handle failed login (customize this based on your API's response)
+  //       setLoginMessage("Login failed. Please check your credentials.");
+  //     }
+  //   } catch (error) {
+  //     // Handle API request errors
+  //     console.error("Error:", error);
+  //     setLoginMessage("An error occurred while processing your request.");
+  //   } finally {
+  //     setIsLoading(false); // Hide loading animation
+  //   }
+  // };
 
   // Handle OTP validation
-  const handleOtpValidation = () => {
-    // Dummy OTP validation logic (customize this based on your API's response)
-    if (otp === "123456") {
-      setIsOtpValid(true); // OTP is valid
-    } else {
-      setIsOtpValid(false); // OTP is invalid
-    }
+  // const handleOtpValidation = () => {
+  //   // Dummy OTP validation logic (customize this based on your API's response)
+  //   if (otp === "123456") {
+  //     setIsOtpValid(true); // OTP is valid
+  //   } else {
+  //     setIsOtpValid(false); // OTP is invalid
+  //   }
   };
 
   return (
@@ -101,18 +119,18 @@ function AdminSignIn() {
                   : "Please sign in to your account."}
               </p>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 tracking-wide">
-                    Phone Number
+                    Email
                   </label>
                   <input
                     className="w-full text-base px-3 py-2 border  border-gray-300 rounded-lg focus:outline-none focus:border-green-400"
                     type="tel"
                     placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -131,7 +149,7 @@ function AdminSignIn() {
                   <button
                     type="submit"
                     className="w-full flex justify-center bg-green-400  hover:bg-green-500 text-gray-100 p-3  rounded-full tracking-wide font-semibold  shadow-lg cursor-pointer transition ease-in duration-500"
-                    onClick={handleSubmit}
+                    // onClick={handleSubmit}
                   >
                     {isSignUp ? "Sign Up" : "Sign In"}
                   </button>
@@ -153,11 +171,10 @@ function AdminSignIn() {
         </div>
       </div>
 
-      {/* OTP Modal */}
-      {showModal && (
+      {/* {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
           <div className="relative w-auto max-w-md mx-auto my-6">
-            {/* Content */}
+           
             <div className="modal">
               <div className="p-6">
                 <h2 className="text-2xl font-semibold mb-4">Enter OTP</h2>
@@ -186,14 +203,14 @@ function AdminSignIn() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
-      {/* Loading Animation */}
-      {isLoading && (
+   
+      {/* {isLoading && (
         <div className="fixed top-0 left-0 h-screen w-screen flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-green-500"></div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
